@@ -7,3 +7,9 @@ services:
       - "5000:5000"
     volumes:
       - ./backend:/app
+    networks:
+      - spectacle-shared-network
+
+networks:
+  spectacle-shared-network:
+    external: true
