@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="View and manage scraper logs">
+    <title>Logs - Scraper Control Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar" role="navigation" aria-label="Main navigation">
+        <h1>Scraper Control Panel</h1>
+    </nav>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar" role="navigation" aria-label="Sidebar navigation">
+            <a href="index.html">
+                <span>Scrapers</span>
+            </a>
+            <a href="services.html">
+                <span>Services</span>
+            </a>
+            <a href="schedules.html">
+                <span>Schedules</span>
+            </a>
+            <a href="logs.html" class="active" aria-current="page">
+                <span>Logs</span>
+            </a>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="content" role="main">
+            <header>
+                <h2>Scraper Logs</h2>
+            </header>
+            <div class="table-wrapper">
+                <table class="styled-table" role="table" aria-label="Scraper logs">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Timestamp</th>
+                            <th>Error</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logsTableBody">
+                        <!-- Rows populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- LOG MODAL -->
+    <div id="logModal" class="modal" role="dialog" aria-labelledby="logModalTitle" aria-modal="true">
+        <div class="modal-backdrop" id="logModalBackdrop"></div>
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <strong id="logModalTitle">Scraper Log Details</strong>
+                <button class="close-btn" id="closeLogModal" aria-label="Close modal">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Log details populated by JS -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="closeLogModalBtn">Close</button>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+
+</html>

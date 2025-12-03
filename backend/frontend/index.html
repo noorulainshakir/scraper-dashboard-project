@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Scraper Control Panel - Manage and monitor your web scrapers">
+  <title>Scrapers - Scraper Control Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <h1>Scraper Control Panel</h1>
+  </nav>
+
+  <div class="layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" role="navigation" aria-label="Sidebar navigation">
+      <a href="index.html" class="active" aria-current="page">
+        <span>Scrapers</span>
+      </a>
+      <a href="services.html">
+        <span>Services</span>
+      </a>
+      <a href="schedules.html">
+        <span>Schedules</span>
+      </a>
+      <a href="logs.html">
+        <span>Logs</span>
+      </a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content" role="main">
+      <header>
+        <h2>All Scrapers</h2>
+      </header>
+      <div class="scraper-table" id="scraperList" role="region" aria-label="Scrapers list">
+        <!-- Scrapers will be populated by JavaScript -->
+      </div>
+    </main>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

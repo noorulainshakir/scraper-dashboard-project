@@ -1,0 +1,36 @@
+# Noco-Wink Inventory Sync Configuration
+# Copy this file to ../.env (project root) and fill in your credentials
+
+# ========================================
+# NocoDB Configuration (Required)
+# ========================================
+NOCODB_API_TOKEN=your_nocodb_api_token_here
+NOCODB_BASE_URL=https://your-nocodb-instance.com
+NOCODB_PROJECT_NAME=Your_Project_Name
+NOCODB_TABLE_NAME=Your_Table_Name
+
+# ========================================
+# Wink API Configuration (Required)
+# ========================================
+WINK_ACCOUNT_ID=your_account_id
+WINK_USERNAME=your_username
+WINK_PASSWORD=your_password
+WINK_STORE_ID=1
+
+# ========================================
+# Notes
+# ========================================
+# 1. This .env should be placed in the project root:
+#    Spectacle-Clinic-Scrapers/.env
+#
+# 2. NocoDB table must have these fields:
+#    - Wink Id (text/number - product ID in Wink)
+#    - Wink Stock Status (text - will be updated)
+#    - Wink Location Inventory (text/json - will be updated)
+#
+# 3. Store mapping is hardcoded:
+#    Store ID 1  → Niagara Falls
+#    Store ID 8  → St. Catharines
+#    Store ID 10 → Niagara On The Lake
+#    Store ID 11 → Welland
+

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Manage scraper services">
+  <title>Services - Scraper Control Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <h1>Scraper Control Panel</h1>
+  </nav>
+
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" role="navigation" aria-label="Sidebar navigation">
+      <a href="index.html">
+        <span>Scrapers</span>
+      </a>
+      <a href="services.html" class="active" aria-current="page">
+        <span>Services</span>
+      </a>
+      <a href="schedules.html">
+        <span>Schedules</span>
+      </a>
+      <a href="logs.html">
+        <span>Logs</span>
+      </a>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content" role="main">
+      <header>
+        <h2>Scraper Services</h2>
+      </header>
+      <div class="table-wrapper">
+        <table class="styled-table" role="table" aria-label="Scraper services">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Status</th>
+              <th>Last Run</th>
+              <th>Next Run</th>
+              <th>Controls</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Luxottica services -->
+            <tr data-id="001" data-status="stopped">
+              <td>001</td>
+              <td> Wink Inventory Sync</td>
+              <td><span class="status stopped">Stopped</span></td>
+              <td>Not Available</td>
+              <td class="next-run">Not Scheduled</td>
+              <td class="controls">
+                <button class="start-btn" aria-label="Start service">Start</button>
+                <button class="stop-btn" disabled aria-label="Stop service">Stop</button>
+                <button class="schedule-btn" aria-label="Schedule service">Schedule</button>
+                <button class="view-log-btn" aria-label="View service logs">View Logs</button>
+              </td>
+            </tr>
+            <tr data-id="002" data-status="stopped">
+              <td>002</td>
+              <td> Wink Product Push</td>
+              <td><span class="status stopped">Stopped</span></td>
+              <td>Not Available</td>
+              <td class="next-run">Not Scheduled</td>
+              <td class="controls">
+                <button class="start-btn" aria-label="Start service">Start</button>
+                <button class="stop-btn" disabled aria-label="Stop service">Stop</button>
+                <button class="schedule-btn" aria-label="Schedule service">Schedule</button>
+                <button class="view-log-btn" aria-label="View service logs">View Logs</button>
+              </td>
+            </tr>
+            <tr data-id="003" data-status="stopped">
+              <td>003</td>
+              <td> Shopify Product Push</td>
+              <td><span class="status stopped">Stopped</span></td>
+              <td>Not Available</td>
+              <td class="next-run">Not Scheduled</td>
+              <td class="controls">
+                <button class="start-btn" aria-label="Start service">Start</button>
+                <button class="stop-btn" disabled aria-label="Stop service">Stop</button>
+                <button class="schedule-btn" aria-label="Schedule service">Schedule</button>
+                <button class="view-log-btn" aria-label="View service logs">View Logs</button>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <!-- SCHEDULE MODAL -->
+  <div id="scheduleModal" class="modal" role="dialog" aria-labelledby="scheduleModalTitle" aria-modal="true">
+    <div class="modal-backdrop" id="scheduleModalBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <strong id="scheduleModalTitle">Schedule Scraper</strong>
+        <button class="close-btn" id="closeScheduleModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="scheduleForm" novalidate>
+          <div class="form-row">
+            <div>
+              <label for="schedScraperId">Scraper ID</label>
+              <input id="schedScraperId" type="text" readonly aria-readonly="true">
+            </div>
+            <div>
+              <label for="schedScraperName">Name</label>
+              <input id="schedScraperName" type="text" readonly aria-readonly="true">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="schedDate">Date</label>
+              <input id="schedDate" type="date" required aria-required="true">
+            </div>
+            <div>
+              <label for="schedTime">Time</label>
+              <input id="schedTime" type="time" required aria-required="true">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="schedFreq">Frequency</label>
+              <select id="schedFreq" required aria-required="true">
+                <option value="one-time">One-time</option>
+                <option value="hourly">Hourly</option>
+                <option value="daily" selected>Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="custom">Custom (cron)</option>
+              </select>
+            </div>
+            <div>
+              <label for="schedTz">Timezone</label>
+              <input id="schedTz" type="text" value="Asia/Karachi" readonly aria-readonly="true">
+            </div>
+          </div>
+          <div class="form-row">
+            <div>
+              <label for="schedCron">Custom cron</label>
+              <input id="schedCron" type="text" placeholder="* * * * *" disabled aria-disabled="true">
+            </div>
+          </div>
+          <div class="error-msg" id="schedError" role="alert" aria-live="polite"></div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="saveScheduleBtn">Save schedule</button>
+        <button type="button" id="cancelScheduleBtn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVICE LOGS MODAL -->
+  <div id="serviceLogModal" class="modal" role="dialog" aria-labelledby="serviceLogModalTitle" aria-modal="true">
+    <div class="modal-backdrop" id="serviceLogModalBackdrop"></div>
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <strong id="serviceLogModalTitle">Service Logs</strong>
+        <button class="close-btn" id="closeServiceLogModal" aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="serviceLogBody">
+        <!-- Logs will be injected here -->
+      </div>
+      <div class="modal-footer">
+        <button id="closeServiceLogModalBtn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast">Schedule saved</div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
