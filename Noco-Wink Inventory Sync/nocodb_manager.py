@@ -148,7 +148,11 @@ class NocoDBManager:
         """Find a record by UPC / EAN field"""
         try:
             # Query NoCoDB to find record by UPC / EAN
-            query_url = f"{self.api_url}?where=(UPC / EAN,eq,{upc})"
+            # URL encode the field name and value
+            from urllib.parse import quote
+            field_name = quote("UPC / EAN", safe='')
+            encoded_upc = quote(str(upc), safe='')
+            query_url = f"{self.api_url}?where=({field_name},eq,{encoded_upc})"
             response = requests.get(query_url, headers=self.headers, timeout=30)
             
             if response.status_code == 200:

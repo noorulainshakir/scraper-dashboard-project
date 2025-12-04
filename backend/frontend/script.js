@@ -378,10 +378,16 @@ async function stopScraper(id, buttonElement) {
 
 // ===================== SCHEDULE MODAL =====================
 function openScheduleModal(id, element) {
-    const name = element.querySelector("h3, td:nth-child(2)")?.textContent.trim() || id;
+    // Try to get name from h3 (card view) or first td (table view)
+    const name = element.querySelector("h3")?.textContent.trim() || 
+                 element.querySelector("td:first-child")?.textContent.trim() || 
+                 element.querySelector("td:nth-child(2)")?.textContent.trim() || 
+                 id;
     
-    document.getElementById("schedScraperId").value = id;
-    document.getElementById("schedScraperName").value = name;
+    const scraperIdInput = document.getElementById("schedScraperId");
+    const scraperNameInput = document.getElementById("schedScraperName");
+    if (scraperIdInput) scraperIdInput.value = id;
+    if (scraperNameInput) scraperNameInput.value = name;
     
     // Set default date/time
     const now = new Date();
