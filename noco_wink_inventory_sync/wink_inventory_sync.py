@@ -19,6 +19,13 @@ from rich.table import Table
 # Import from local module (nocodb_manager.py in same directory)
 from noco_wink_inventory_sync.nocodb_manager import NocoDBManager
 
+from backend.websocket_manager import manager
+
+
+
+# Ab yahan manager ka broadcast ya send_json use kar sakte ho
+
+
 
 # Configure logging
 logging.basicConfig(
