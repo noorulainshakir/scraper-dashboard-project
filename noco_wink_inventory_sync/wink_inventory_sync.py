@@ -17,7 +17,8 @@ from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeRe
 from rich.table import Table
 
 # Import from local module (nocodb_manager.py in same directory)
-from nocodb_manager import NocoDBManager
+from noco_wink_inventory_sync.nocodb_manager import NocoDBManager
+
 
 # Configure logging
 logging.basicConfig(
