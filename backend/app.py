@@ -8,7 +8,8 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 
 # Add project root to Python path
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, project_root)
 
 from noco_wink_inventory_sync.nocodb_manager import NocoDBManager
 from noco_wink_inventory_sync.wink_inventory_sync import WinkInventorySync
