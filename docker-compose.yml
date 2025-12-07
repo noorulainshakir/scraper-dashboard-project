@@ -1,6 +1,18 @@
 version: "3.9"
 
 services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   backend:
     build:
       context: .
@@ -10,8 +22,50 @@ services:
     volumes:
       - ./backend:/app
       - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
-######## required on server only
+      - ./backend/jobs.db:/app/jobs.db
+      - ./backend/logs:/app/logs
+    env_file:
+      - ./backend/.env
+    depends_on:
+      redis:
+        condition: service_healthy
+    command: uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload
 
+  celery-worker:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    volumes:
+      - ./backend:/app
+      - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
+      - ./backend/jobs.db:/app/jobs.db
+      - ./backend/logs:/app/logs
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+      - backend
+    command: celery -A app.infrastructure.celery_app worker --loglevel=info
+
+  celery-beat:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    volumes:
+      - ./backend:/app
+      - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
+      - ./backend/jobs.db:/app/jobs.db
+    env_file:
+      - ./backend/.env
+    depends_on:
+      - redis
+      - backend
+    command: celery -A app.infrastructure.celery_app beat --loglevel=info
+
+volumes:
+  redis_data:
+
+######## required on server only
 #     networks:
 #       - spectacle-shared-network
 

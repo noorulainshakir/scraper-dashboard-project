@@ -1,0 +1,27 @@
+# FastAPI and server
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+python-multipart>=0.0.6
+
+# Configuration
+pydantic-settings>=2.0.0
+python-dotenv>=1.0.0
+
+# Database
+sqlalchemy>=2.0.0
+
+# Celery and Redis
+celery>=5.3.0
+redis>=5.0.0
+kombu>=5.3.0
+
+# Scheduling
+croniter>=2.0.0
+
+# Wink sync dependencies
+requests>=2.31.0
+rich>=13.7.0
+
+# WebSocket
+websockets>=12.0
+

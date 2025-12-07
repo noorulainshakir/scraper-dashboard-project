@@ -101,9 +101,14 @@ function setupServiceButtons() {
 
             // API call
             try {
-                const res = await fetch(`/api/services/wink-sync/start`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+                const res = await fetch(`/api/v1/services/wink-sync/start`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: '{}' 
+                });
                 const data = await res.json();
                 row.dataset.jobId = data.job_id;
+                row.dataset.jobId = data.job_id; // Also set for WebSocket updates
                 showToast(`Service ${id} started`);
             } catch (e) {
                 showToast(`Failed to start ${id}`, 'error');
@@ -124,7 +129,7 @@ function setupServiceButtons() {
             row.querySelector('.status').className = 'status stopped';
 
             try {
-                const res = await fetch(`/api/services/wink-sync/stop/${jobId}`, { method: 'POST' });
+                const res = await fetch(`/api/v1/services/wink-sync/stop/${jobId}`, { method: 'POST' });
                 const data = await res.json();
                 showToast(`Service ${id} stopped`);
             } catch (e) {
@@ -155,7 +160,7 @@ document.querySelectorAll('.view-log-btn').forEach(btn => {
         if (!jobId) { alert("No job ID found for this service."); return; }
 
         try {
-            const res = await fetch(`/api/services/wink-sync/logs/${jobId}`);
+            const res = await fetch(`/api/v1/services/wink-sync/logs/${jobId}`);
             const data = await res.json();
 
             // 👇 Debug line yahan daalo
@@ -185,11 +190,47 @@ document.querySelectorAll('.view-log-btn').forEach(btn => {
 
 // ===================== WEBSOCKET LIVE LOGS =====================
 function setupWebSocket() {
-    const ws = new WebSocket("ws://localhost:8000/ws/logs");
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${window.location.host}/ws/logs`;
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onopen = () => {
+        console.log("WebSocket connected");
+    };
+    
     ws.onmessage = event => {
-        const data = JSON.parse(event.data);
-        console.log("Live update:", data);
-        // Yahan tum chaaho to progress bar ya table update kar sakti ho
+        try {
+            const data = JSON.parse(event.data);
+            console.log("Live update:", data);
+            
+            // Update job status in table if job exists
+            const row = document.querySelector(`tr[data-job-id="${data.job_id}"]`);
+            if (row) {
+                const statusCell = row.querySelector('.status');
+                const progressCell = row.querySelector('.progress');
+                
+                if (statusCell) {
+                    statusCell.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                    statusCell.className = `status ${data.status}`;
+                }
+                
+                if (progressCell) {
+                    progressCell.textContent = `${data.progress}%`;
+                }
+            }
+        } catch (e) {
+            console.error("Error parsing WebSocket message:", e);
+        }
+    };
+    
+    ws.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+    
+    ws.onclose = () => {
+        console.log("WebSocket disconnected, reconnecting...");
+        // Reconnect after 5 seconds
+        setTimeout(setupWebSocket, 5000);
     };
 }
 
