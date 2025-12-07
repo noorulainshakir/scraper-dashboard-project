@@ -22,10 +22,12 @@ services:
     volumes:
       - ./backend:/app
       - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
-      - ./backend/jobs.db:/app/jobs.db
+      - ./backend/data:/app/data
       - ./backend/logs:/app/logs
     env_file:
       - ./backend/.env
+    environment:
+      - REDIS_HOST=redis  # Override to use Docker service name
     depends_on:
       redis:
         condition: service_healthy
@@ -38,10 +40,12 @@ services:
     volumes:
       - ./backend:/app
       - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
-      - ./backend/jobs.db:/app/jobs.db
+      - ./backend/data:/app/data
       - ./backend/logs:/app/logs
     env_file:
       - ./backend/.env
+    environment:
+      - REDIS_HOST=redis  # Override to use Docker service name
     depends_on:
       - redis
       - backend
@@ -54,9 +58,11 @@ services:
     volumes:
       - ./backend:/app
       - ./noco_wink_inventory_sync:/app/noco_wink_inventory_sync
-      - ./backend/jobs.db:/app/jobs.db
+      - ./backend/data:/app/data
     env_file:
       - ./backend/.env
+    environment:
+      - REDIS_HOST=redis  # Override to use Docker service name
     depends_on:
       - redis
       - backend

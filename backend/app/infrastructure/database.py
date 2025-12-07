@@ -14,8 +14,14 @@ from app.domain.models import Job, JobStatus
 class JobRepository:
     """Repository for job persistence using SQLite"""
     
-    def __init__(self, db_path: str = "jobs.db"):
-        self.db_path = db_path
+    def __init__(self, db_path: str = "data/jobs.db"):
+        # Ensure directory exists for database file
+        db_dir = os.path.dirname(os.path.abspath(db_path))
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir, exist_ok=True)
+        
+        # Use absolute path
+        self.db_path = os.path.abspath(db_path)
         self._init_database()
     
     def _init_database(self):

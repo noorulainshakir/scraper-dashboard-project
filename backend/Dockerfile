@@ -18,8 +18,8 @@ COPY backend/ .
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Create logs directory
-RUN mkdir -p logs
+# Create logs and data directories
+RUN mkdir -p logs data
 
 # Expose port
 EXPOSE 5000

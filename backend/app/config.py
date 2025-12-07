@@ -19,7 +19,8 @@ class Settings(BaseSettings):
     database_url: str = "sqlite:///./jobs.db"
     
     # Redis Configuration (for Celery)
-    redis_host: str = "localhost"
+    # Default to "redis" for Docker, use "localhost" for local development
+    redis_host: str = "redis"  # Docker service name, change to "localhost" for local dev
     redis_port: int = 6379
     redis_db: int = 0
     redis_password: str = ""
