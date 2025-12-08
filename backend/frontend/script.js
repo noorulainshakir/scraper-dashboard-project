@@ -326,8 +326,154 @@ function setupWebSocket() {
     };
 }
 
+// ===================== SCRAPER LIST (INDEX PAGE) =====================
+function setupScraperList() {
+    const scraperList = document.getElementById('scraperList');
+    if (!scraperList) return; // Not on index page
+    
+    // Hardcoded scrapers: Luxottica and Safilo only
+    const scrapers = [
+        {
+            id: 'luxottica',
+            name: 'Luxottica',
+            description: 'Scrapes product data from Luxottica websites',
+            status: 'running',
+            lastRun: '2025-12-08 10:30 AM',
+            nextRun: '2025-12-09 02:00 AM',
+            records: 1250,
+            progress: 75
+        },
+        {
+            id: 'safilo',
+            name: 'Safilo',
+            description: 'Scrapes product data from Safilo websites',
+            status: 'stopped',
+            lastRun: '2025-12-07 02:00 AM',
+            nextRun: '2025-12-09 02:00 AM',
+            records: 890,
+            progress: 0
+        }
+    ];
+    
+    // Clear existing content
+    scraperList.innerHTML = '';
+    
+    // Create scraper cards
+    scrapers.forEach(scraper => {
+        const card = document.createElement('div');
+        card.className = 'scraper-card';
+        card.dataset.id = scraper.id;
+        card.dataset.status = scraper.status;
+        
+        card.innerHTML = `
+            <div class="scraper-card-header">
+                <h3>${scraper.name}</h3>
+                <span class="status ${scraper.status}">${scraper.status.charAt(0).toUpperCase() + scraper.status.slice(1)}</span>
+            </div>
+            <p class="scraper-description">${scraper.description}</p>
+            <div class="scraper-stats">
+                <div class="stat-item">
+                    <span class="stat-label">Records</span>
+                    <span class="stat-value">${scraper.records.toLocaleString()}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Last Run</span>
+                    <span class="stat-value">${scraper.lastRun}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Next Run</span>
+                    <span class="stat-value">${scraper.nextRun}</span>
+                </div>
+            </div>
+            ${scraper.status === 'running' ? `
+            <div class="scraper-progress">
+                <div class="progress-container">
+                    <div class="progress-bar active" style="width: ${scraper.progress}%">
+                        <span class="progress-text">${scraper.progress}%</span>
+                    </div>
+                </div>
+            </div>
+            ` : ''}
+            <div class="scraper-actions">
+                <button class="start-btn" ${scraper.status === 'running' ? 'disabled' : ''}>Start</button>
+                <button class="stop-btn" ${scraper.status === 'stopped' ? 'disabled' : ''}>Stop</button>
+                <button class="view-details-btn">View Details</button>
+            </div>
+        `;
+        
+        scraperList.appendChild(card);
+    });
+    
+    // Add event listeners to scraper cards
+    setupScraperCardButtons();
+}
+
+function setupScraperCardButtons() {
+    // Start buttons on scraper cards
+    document.querySelectorAll('#scraperList .start-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.scraper-card');
+            const id = card.dataset.id;
+            btn.disabled = true;
+            card.querySelector('.stop-btn').disabled = false;
+            card.querySelector('.status').textContent = 'Running';
+            card.querySelector('.status').className = 'status running';
+            card.dataset.status = 'running';
+            
+            // Show progress bar if not exists
+            let progressContainer = card.querySelector('.scraper-progress');
+            if (!progressContainer) {
+                progressContainer = document.createElement('div');
+                progressContainer.className = 'scraper-progress';
+                progressContainer.innerHTML = `
+                    <div class="progress-container">
+                        <div class="progress-bar active" style="width: 0%">
+                            <span class="progress-text">0%</span>
+                        </div>
+                    </div>
+                `;
+                card.querySelector('.scraper-actions').before(progressContainer);
+            }
+            
+            showToast(`Scraper ${id} started`);
+        });
+    });
+    
+    // Stop buttons on scraper cards
+    document.querySelectorAll('#scraperList .stop-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.scraper-card');
+            const id = card.dataset.id;
+            btn.disabled = true;
+            card.querySelector('.start-btn').disabled = false;
+            card.querySelector('.status').textContent = 'Stopped';
+            card.querySelector('.status').className = 'status stopped';
+            card.dataset.status = 'stopped';
+            
+            // Remove progress bar
+            const progressContainer = card.querySelector('.scraper-progress');
+            if (progressContainer) {
+                progressContainer.remove();
+            }
+            
+            showToast(`Scraper ${id} stopped`);
+        });
+    });
+    
+    // View details buttons
+    document.querySelectorAll('#scraperList .view-details-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const card = btn.closest('.scraper-card');
+            const id = card.dataset.id;
+            // Navigate to services page or show details
+            window.location.href = 'services.html';
+        });
+    });
+}
+
 // ===================== INIT =====================
 document.addEventListener('DOMContentLoaded', () => {
+    setupScraperList(); // Populate scraper list on index page
     setupScheduleModal();
     setupServiceButtons();
     setupWebSocket();
