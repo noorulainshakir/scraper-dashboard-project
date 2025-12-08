@@ -20,12 +20,14 @@ async def websocket_logs(websocket: WebSocket):
     
     try:
         while True:
-            # Get all running jobs
-            running_jobs = job_service.list_jobs(status=None, limit=50)
+            # Get all recent jobs (running, pending, or recently completed)
+            from app.domain.models import JobStatus
+            recent_jobs = job_service.list_jobs(status=None, limit=50)
             
-            # Send updates for each job
-            for job in running_jobs:
-                if job.logs:
+            # Send updates for each job (including progress updates)
+            for job in recent_jobs:
+                # Send update if job is active or recently completed
+                if job.status in [JobStatus.PENDING, JobStatus.RUNNING, JobStatus.COMPLETED, JobStatus.FAILED]:
                     await websocket.send_json({
                         "job_id": job.id,
                         "status": job.status.value,

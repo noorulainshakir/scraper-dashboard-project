@@ -107,8 +107,20 @@ function setupServiceButtons() {
                     body: '{}' 
                 });
                 const data = await res.json();
-                row.dataset.jobId = data.job_id;
-                row.dataset.jobId = data.job_id; // Also set for WebSocket updates
+                row.dataset.jobId = data.job_id; // Set for WebSocket updates
+                
+                // Reset progress bar
+                const progressBar = row.querySelector('.progress-bar');
+                const progressText = row.querySelector('.progress-text');
+                if (progressBar) {
+                    progressBar.style.width = '0%';
+                    progressBar.classList.remove('completed');
+                    progressBar.classList.add('active');
+                }
+                if (progressText) {
+                    progressText.textContent = '0%';
+                }
+                
                 showToast(`Service ${id} started`);
             } catch (e) {
                 showToast(`Failed to start ${id}`, 'error');
@@ -127,6 +139,17 @@ function setupServiceButtons() {
             row.querySelector('.start-btn').disabled = false;
             row.querySelector('.status').textContent = 'Stopped';
             row.querySelector('.status').className = 'status stopped';
+            
+            // Reset progress bar
+            const progressBar = row.querySelector('.progress-bar');
+            const progressText = row.querySelector('.progress-text');
+            if (progressBar) {
+                progressBar.style.width = '0%';
+                progressBar.classList.remove('active', 'completed');
+            }
+            if (progressText) {
+                progressText.textContent = '0%';
+            }
 
             try {
                 const res = await fetch(`/api/v1/services/wink-sync/stop/${jobId}`, { method: 'POST' });
@@ -205,17 +228,47 @@ function setupWebSocket() {
             
             // Update job status in table if job exists
             const row = document.querySelector(`tr[data-job-id="${data.job_id}"]`);
+            if (!row) {
+                // Try to find by service ID if job_id not found
+                const allRows = document.querySelectorAll('tr[data-id]');
+                for (const r of allRows) {
+                    if (r.dataset.jobId === data.job_id) {
+                        row = r;
+                        break;
+                    }
+                }
+            }
+            
             if (row) {
+                // Update status
                 const statusCell = row.querySelector('.status');
-                const progressCell = row.querySelector('.progress');
-                
                 if (statusCell) {
-                    statusCell.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                    const statusText = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+                    statusCell.textContent = statusText;
                     statusCell.className = `status ${data.status}`;
                 }
                 
-                if (progressCell) {
-                    progressCell.textContent = `${data.progress}%`;
+                // Update progress bar
+                const progressBar = row.querySelector('.progress-bar');
+                const progressText = row.querySelector('.progress-text');
+                if (progressBar && data.progress !== undefined) {
+                    const progress = Math.min(100, Math.max(0, data.progress));
+                    progressBar.style.width = `${progress}%`;
+                    
+                    // Update progress text
+                    if (progressText) {
+                        progressText.textContent = `${progress}%`;
+                    }
+                    
+                    // Add color based on progress
+                    if (progress === 100) {
+                        progressBar.classList.add('completed');
+                    } else if (progress > 0) {
+                        progressBar.classList.add('active');
+                        progressBar.classList.remove('completed');
+                    } else {
+                        progressBar.classList.remove('active', 'completed');
+                    }
                 }
             }
         } catch (e) {
