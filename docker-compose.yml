@@ -12,6 +12,9 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - default
+      - spectacle-shared-network
 
   backend:
     build:
@@ -34,6 +37,9 @@ services:
       redis:
         condition: service_healthy
     command: uvicorn app.main:app --host 0.0.0.0 --port 5000 --reload
+    networks:
+      - default
+      - spectacle-shared-network
 
   celery-worker:
     build:
@@ -54,6 +60,9 @@ services:
       - redis
       - backend
     command: celery -A app.infrastructure.celery_app worker --loglevel=info
+    networks:
+      - default
+      - spectacle-shared-network
 
   celery-beat:
     build:
@@ -73,14 +82,16 @@ services:
       - redis
       - backend
     command: celery -A app.infrastructure.celery_app beat --loglevel=info
+    networks:
+      - default
+      - spectacle-shared-network
 
 volumes:
   redis_data:
 
 ######## required on server only
-#     networks:
-#       - spectacle-shared-network
-
-# networks:
-#   spectacle-shared-network:
-#     external: true
+networks:
+  default:
+    driver: bridge
+  spectacle-shared-network:
+    external: true
