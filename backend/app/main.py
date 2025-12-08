@@ -37,10 +37,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include routers
+# Include routers with v1 prefix
 app.include_router(
     wink_sync.router,
     prefix=settings.api_v1_prefix
+)
+
+# Also include without v1 prefix for backward compatibility
+app.include_router(
+    wink_sync.router,
+    prefix="/api"
 )
 
 # Include WebSocket router

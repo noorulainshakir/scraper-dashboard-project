@@ -31,11 +31,18 @@ class JobService:
         )
         job = self.repo.create_job(job)
         
-        # Queue Celery task
-        task = sync_wink_inventory.delay(job_id)
-        job.celery_task_id = task.id
-        job.status = JobStatus.RUNNING
-        job.logs.append(f"Job queued with task ID: {task.id}")
+        # Queue Celery task (with error handling)
+        try:
+            task = sync_wink_inventory.delay(job_id)
+            job.celery_task_id = task.id
+            job.status = JobStatus.RUNNING
+            job.logs.append(f"Job queued with task ID: {task.id}")
+        except Exception as e:
+            # If Celery is not available, mark job as failed
+            job.status = JobStatus.FAILED
+            job.error = f"Failed to queue job: {str(e)}"
+            job.logs.append(f"Error queuing job: {str(e)}")
+        
         self.repo.update_job(job)
         
         return job
@@ -46,17 +53,21 @@ class JobService:
         if not job:
             return None
         
-        # Update from Celery if running
+        # Update from Celery if running (with error handling)
         if job.celery_task_id and job.status == JobStatus.RUNNING:
-            task_result = AsyncResult(job.celery_task_id, app=celery_app)
-            if task_result.ready():
-                if task_result.successful():
-                    job.status = JobStatus.COMPLETED
-                    job.progress = 100
-                else:
-                    job.status = JobStatus.FAILED
-                    job.error = str(task_result.info) if task_result.info else "Task failed"
-                self.repo.update_job(job)
+            try:
+                task_result = AsyncResult(job.celery_task_id, app=celery_app)
+                if task_result.ready():
+                    if task_result.successful():
+                        job.status = JobStatus.COMPLETED
+                        job.progress = 100
+                    else:
+                        job.status = JobStatus.FAILED
+                        job.error = str(task_result.info) if task_result.info else "Task failed"
+                    self.repo.update_job(job)
+            except Exception:
+                # If Celery is not available, just return the job as-is
+                pass
         
         return job
     
@@ -69,9 +80,13 @@ class JobService:
         if job.status != JobStatus.RUNNING:
             raise JobNotRunningError(f"Job {job_id} is not running")
         
-        # Revoke Celery task
+        # Revoke Celery task (with error handling)
         if job.celery_task_id:
-            celery_app.control.revoke(job.celery_task_id, terminate=True)
+            try:
+                celery_app.control.revoke(job.celery_task_id, terminate=True)
+            except Exception:
+                # If Celery is not available, just mark as stopped
+                pass
         
         job.status = JobStatus.STOPPED
         job.logs.append("Job stopped by user")
