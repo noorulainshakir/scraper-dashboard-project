@@ -73,11 +73,10 @@ class Settings(BaseSettings):
     
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        # Set Celery URLs from Redis if not explicitly set
+        # Set Celery broker URL from Redis if not explicitly set
         if not self.celery_broker_url:
             self.celery_broker_url = self.redis_url
-        if not self.celery_result_backend:
-            self.celery_result_backend = self.redis_url
+        # Keep result backend as provided (can be empty to disable results)
 
 
 @lru_cache()

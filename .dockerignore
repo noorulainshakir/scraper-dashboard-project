@@ -1,5 +1,3 @@
-# Docker ignore file
-docker-compose.yml
 .git
 .gitignore
 *.md
@@ -14,4 +12,4 @@ venv
 .env
 *.log
 .DS_Store
-
+backend/.env

@@ -28,6 +28,7 @@ services:
       - ./backend/.env
     environment:
       - REDIS_HOST=redis  # Override to use Docker service name
+      # No CELERY_RESULT_BACKEND here to avoid backend polling Redis for results
     depends_on:
       redis:
         condition: service_healthy
@@ -46,6 +47,8 @@ services:
       - ./backend/.env
     environment:
       - REDIS_HOST=redis  # Override to use Docker service name
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
       - backend
@@ -63,6 +66,8 @@ services:
       - ./backend/.env
     environment:
       - REDIS_HOST=redis  # Override to use Docker service name
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
       - backend

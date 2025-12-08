@@ -10,7 +10,7 @@ settings = get_settings()
 celery_app = Celery(
     "scraper_dashboard",
     broker=settings.celery_broker_url,
-    backend=settings.celery_result_backend,
+    backend=settings.celery_result_backend or None,
     include=["app.tasks.wink_sync_task"]
 )
 
