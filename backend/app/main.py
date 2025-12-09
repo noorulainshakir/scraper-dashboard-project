@@ -3,9 +3,10 @@ FastAPI application entry point
 """
 import sys
 import os
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import FileResponse
 
 # Add project root to path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -51,6 +52,16 @@ app.include_router(
 
 # Include WebSocket router
 app.include_router(websocket_router)
+
+# Middleware to add no-cache headers for JS files
+@app.middleware("http")
+async def no_cache_js_middleware(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.endswith('.js'):
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+        response.headers["Pragma"] = "no-cache"
+        response.headers["Expires"] = "0"
+    return response
 
 # Mount frontend static files
 frontend_path = os.path.join(os.path.dirname(__file__), "..", "frontend")
